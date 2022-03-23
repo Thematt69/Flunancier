@@ -14,7 +14,14 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
+  flutter_native_splash: ^2.1.1
   lint: ^1.8.2
+
+flutter_native_splash:
+  color: "#0D0D0D"
+  image: assets/trans_logo.png
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

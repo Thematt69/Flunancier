@@ -1,11 +1,11 @@
 var firebaseConfig = {
-  // apiKey: "AIzaSyDwfUiF4-MRr363UGnSFnK0Bv3938WdLHI",
-  // authDomain: "pizza-app-s.firebaseapp.com",
-  // projectId: "pizza-app-s",
-  // storageBucket: "pizza-app-s.appspot.com",
-  // messagingSenderId: "151587877700",
-  // appId: "1:151587877700:web:32ba520f437ab6ac7ddd11",
-  // measurementId: "G-13LWQLRVCB",
+  apiKey: "AIzaSyBc3M10pH_EHcVyiOxDZyJGlqMosz475Xw",
+  authDomain: "flunancier.firebaseapp.com",
+  projectId: "flunancier",
+  storageBucket: "flunancier.appspot.com",
+  messagingSenderId: "675397547281",
+  appId: "1:675397547281:web:98b27fa4d34eb29bcc88b0",
+  measurementId: "G-3852RDQSX9",
 };
 
 // Initialize Firebase

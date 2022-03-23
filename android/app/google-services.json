@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "675397547281",
+    "project_id": "flunancier",
+    "storage_bucket": "flunancier.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675397547281:android:47592ddc8bf4599ccc88b0",
+        "android_client_info": {
+          "package_name": "fr.thematt69.flunancier"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675397547281-7k671ja66kpqvqajvrbqjk69ejqmfag3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXuuoIYkXoNjZstu6l2gFvoO2M87oMBsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675397547281-7k671ja66kpqvqajvrbqjk69ejqmfag3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,5 @@
+import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
-import 'package:flunancier/blocs/crashlytics_bloc.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -7,19 +7,26 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  static const String routeName = "/my-home";
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final _analyticsBloc = BlocProvider.of<AnalyticsBloc>(context);
   int _counter = 0;
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
-    BlocProvider.of<CrashlyticsBloc>(context)
-        .error(reason: "reason", exception: Exception("exception"));
+  }
+
+  @override
+  void initState() {
+    _analyticsBloc.setScreenName(MyHomePage.routeName);
+    super.initState();
   }
 
   @override

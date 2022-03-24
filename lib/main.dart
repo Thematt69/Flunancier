@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/crashlytics_bloc.dart';
 import 'package:flunancier/my_home_page.dart';
@@ -35,11 +36,16 @@ class MyApp extends StatelessWidget {
           key: GlobalKey(),
           blocs: [
             CrashlyticsBloc(),
+            AnalyticsBloc(),
           ],
           child: MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(primarySwatch: Colors.orange),
-            home: const MyHomePage(title: 'Flutter Demo Home Page'),
+            initialRoute: MyHomePage.routeName,
+            routes: {
+              MyHomePage.routeName: (context) =>
+                  const MyHomePage(title: 'Flutter Demo Home Page'),
+            },
           ),
         );
       },

@@ -1,5 +1,8 @@
 import 'package:flunancier/blocs/analytics_bloc.dart';
+import 'package:flunancier/blocs/authentication_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
+import 'package:flunancier/pages/login_page.dart';
+import 'package:flunancier/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,6 +18,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late final _analyticsBloc = BlocProvider.of<AnalyticsBloc>(context);
+  late final _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
   int _counter = 0;
 
   void _incrementCounter() {
@@ -45,6 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            CustomElevatedButton(
+              label: 'Déconnecter',
+              onPressed: () {
+                _authenticationBloc.signOut();
+                Navigator.pushReplacementNamed(context, LoginPage.routeName);
+              },
             ),
           ],
         ),

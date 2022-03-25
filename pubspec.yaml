@@ -12,13 +12,16 @@ environment:
 dependencies:
   equatable: ^2.0.3
   firebase_analytics: ^9.1.2
+  firebase_auth: ^3.3.11
   firebase_core: ^1.13.1
   firebase_crashlytics: ^2.5.3
   flutter:
     sdk: flutter
+  flutter_native_splash: ^2.1.1
+  rxdart: ^0.27.3
+  url_strategy: ^0.2.0
 
 dev_dependencies:
-  flutter_native_splash: ^2.1.1
   lint: ^1.8.2
 
 flutter_native_splash:

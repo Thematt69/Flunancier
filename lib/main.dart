@@ -7,7 +7,6 @@ import 'package:flunancier/blocs/crashlytics_bloc.dart';
 import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/pages/my_home_page.dart';
 import 'package:flunancier/pages/register_page.dart';
-import 'package:flunancier/widgets/custom_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:url_strategy/url_strategy.dart';

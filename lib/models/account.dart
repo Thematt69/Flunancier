@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Account extends Equatable {
+  static const collectionName = "accounts";
   static const entryUuid = "uuid";
   static const entryName = "name";
   static const entryTotal = "total";

@@ -106,6 +106,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
             Expanded(
               child: CustomStreamBuilder<List<Transaction>>(
                 stream: _storeBloc.onTransactionChange(account),
+                waitingBuilder: () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
                 dataBuilder: (context, data) {
                   if (data.isEmpty) {
                     return Padding(

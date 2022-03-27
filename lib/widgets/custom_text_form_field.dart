@@ -12,6 +12,7 @@ class CustomTextFormField extends StatefulWidget {
   final int? maxLength;
   final int maxLines;
   final BoxConstraints? constraints;
+  final String? suffixText;
 
   const CustomTextFormField._({
     required this.controller,
@@ -26,6 +27,7 @@ class CustomTextFormField extends StatefulWidget {
     this.maxLength,
     this.maxLines = 1,
     this.constraints,
+    this.suffixText,
   }) : super(key: key);
 
   factory CustomTextFormField.password({
@@ -36,7 +38,6 @@ class CustomTextFormField extends StatefulWidget {
     String? Function(String?)? validator,
     Key? key,
     int? maxLength,
-    int maxLines = 1,
     BoxConstraints? constraints,
   }) {
     return CustomTextFormField._(
@@ -50,7 +51,6 @@ class CustomTextFormField extends StatefulWidget {
       key: key,
       label: 'Mot de passe',
       maxLength: maxLength,
-      maxLines: maxLines,
       constraints: constraints,
     );
   }
@@ -93,6 +93,7 @@ class CustomTextFormField extends StatefulWidget {
     int? maxLength,
     int maxLines = 1,
     BoxConstraints? constraints,
+    String? suffixText,
   }) {
     return CustomTextFormField._(
       controller: controller,
@@ -106,6 +107,36 @@ class CustomTextFormField extends StatefulWidget {
       maxLength: maxLength,
       maxLines: maxLines,
       constraints: constraints,
+      suffixText: suffixText,
+    );
+  }
+
+  factory CustomTextFormField.number({
+    required TextEditingController controller,
+    required String label,
+    TextInputAction? textInputAction,
+    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
+    void Function(String)? onFieldSubmitted,
+    String? Function(String?)? validator,
+    Key? key,
+    int? maxLength,
+    int maxLines = 1,
+    BoxConstraints? constraints,
+    String? suffixText,
+  }) {
+    return CustomTextFormField._(
+      controller: controller,
+      textInputAction: textInputAction,
+      textInputType: TextInputType.number,
+      autovalidateMode: autovalidateMode,
+      onFieldSubmitted: onFieldSubmitted,
+      validator: validator,
+      key: key,
+      label: label,
+      maxLength: maxLength,
+      maxLines: maxLines,
+      constraints: constraints,
+      suffixText: suffixText,
     );
   }
 
@@ -149,6 +180,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                       .withOpacity(0.6),
                 ),
           ),
+          suffixText: widget.suffixText,
           suffixIcon: widget.itPassword
               ? IconButton(
                   icon: Icon(

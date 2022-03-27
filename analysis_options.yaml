@@ -1,1 +1,11 @@
 include: package:lint/analysis_options.yaml
+
+linter:
+  rules:
+    use_key_in_widget_constructors: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    close_sinks: true
+    cancel_subscriptions: true
+    unnecessary_late: true
+    use_decorated_box: true

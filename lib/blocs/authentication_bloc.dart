@@ -10,7 +10,7 @@ class AuthenticationBloc extends BlocBase {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    _exceptionController.close();
   }
 
   @override
@@ -34,7 +34,7 @@ class AuthenticationBloc extends BlocBase {
   void _setException(FirebaseAuthException exception) =>
       _exceptionController.sink.add(exception);
 
-  User? get _currentUser => _auth.currentUser;
+  User? get currentUser => _auth.currentUser;
 
   Future<void> _checkEmailVerification(UserCredential userCredential) async {
     if (userCredential.user != null && !userCredential.user!.emailVerified) {
@@ -121,7 +121,7 @@ class AuthenticationBloc extends BlocBase {
 
   Future<void> deleteUser() async {
     try {
-      await _currentUser?.delete();
+      await currentUser?.delete();
     } on FirebaseAuthException catch (e, s) {
       _setException(e);
       _crashlyticsBloc.error(

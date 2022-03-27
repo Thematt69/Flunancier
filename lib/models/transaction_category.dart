@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 enum TypeTransaction { expenses, income }
 
 class TransactionCategory extends Equatable {
-  static const entryName = "name";
-  static const entryIcon = "icon";
-  static const entryColor = "color";
-  static const entryType = "type";
-  static const entrySubCategory = "subCategory";
+  static const entryName = 'name';
+  static const entryIcon = 'icon';
+  static const entryColor = 'color';
+  static const entryType = 'type';
+  static const entrySubCategory = 'subCategory';
 
   final String name;
   final IconData icon;
@@ -27,7 +27,7 @@ class TransactionCategory extends Equatable {
   factory TransactionCategory.fromFireStore(Map<String, dynamic> json) =>
       TransactionCategory(
         name: json[entryName] as String,
-        icon: IconData(json[entryIcon] as int),
+        icon: IconData(json[entryIcon] as int, fontFamily: 'MaterialIcons'),
         color: Color(json[entryColor] as int),
         type: TypeTransaction.values[json[entryType] as int],
         subCategory: json[entrySubCategory] is List

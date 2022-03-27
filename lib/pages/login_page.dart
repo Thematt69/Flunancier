@@ -1,6 +1,7 @@
+import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/authentication_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
-import 'package:flunancier/pages/my_home_page.dart';
+import 'package:flunancier/pages/my_account_page.dart';
 import 'package:flunancier/pages/register_page.dart';
 import 'package:flunancier/widgets/auth_exception_info.dart';
 import 'package:flunancier/widgets/custom_button.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
-  static const String routeName = "/login";
+  static const String routeName = '/login';
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -24,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    BlocProvider.of<AnalyticsBloc>(context).setScreenName(LoginPage.routeName);
     _email.addListener(() => _authenticationBloc.clearException());
     _password.addListener(() => _authenticationBloc.clearException());
     super.initState();
@@ -45,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       )
           .then((user) {
         if (user != null) {
-          Navigator.pushReplacementNamed(context, MyHomePage.routeName);
+          Navigator.pushReplacementNamed(context, MyAccountPage.routeName);
         }
       });
     }
@@ -64,13 +66,13 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "Bienvenue sur Flunancier !",
+                    'Bienvenue sur Flunancier !',
                     style: Theme.of(context).textTheme.headline3,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Se connecter",
+                    'Se connecter',
                     style: Theme.of(context).textTheme.headline4,
                     textAlign: TextAlign.center,
                   ),
@@ -108,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   CustomElevatedButton(
                     onPressed: () async => _login(),
-                    label: "Connexion",
+                    label: 'Connexion',
                   ),
                 ],
               ),

@@ -1,7 +1,8 @@
+import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/authentication_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/pages/login_page.dart';
-import 'package:flunancier/pages/my_home_page.dart';
+import 'package:flunancier/pages/my_account_page.dart';
 import 'package:flunancier/widgets/auth_exception_info.dart';
 import 'package:flunancier/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
-  static const String routeName = "/register";
+  static const String routeName = '/register';
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -23,6 +24,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void initState() {
+    BlocProvider.of<AnalyticsBloc>(context)
+        .setScreenName(RegisterPage.routeName);
     _email.addListener(() => _authenticationBloc.clearException());
     _password.addListener(() => _authenticationBloc.clearException());
     super.initState();
@@ -44,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
       )
           .then((user) {
         if (user != null) {
-          Navigator.pushReplacementNamed(context, MyHomePage.routeName);
+          Navigator.pushReplacementNamed(context, MyAccountPage.routeName);
         }
       });
     }
@@ -63,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "Bienvenue sur Flunancier !",
+                    'Bienvenue sur Flunancier !',
                     style: Theme.of(context).textTheme.headline3,
                     textAlign: TextAlign.center,
                   ),
@@ -80,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     textInputAction: TextInputAction.next,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                      label: Text("Adresse mail"),
+                      label: Text('Adresse mail'),
                       constraints: BoxConstraints(maxWidth: 350),
                       border: OutlineInputBorder(),
                     ),
@@ -100,7 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     textInputAction: TextInputAction.done,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(
-                      label: Text("Mot de passe"),
+                      label: Text('Mot de passe'),
                       constraints: BoxConstraints(maxWidth: 350),
                       border: OutlineInputBorder(),
                     ),
@@ -115,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const AuthExceptionInfo(),
                   const SizedBox(height: 8),
                   CustomTextButton(
-                    label: "Déja un compte ?",
+                    label: 'Déja un compte ?',
                     onPressed: () =>
                         Navigator.pushNamed(context, LoginPage.routeName),
                   ),

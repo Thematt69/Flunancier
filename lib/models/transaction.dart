@@ -4,28 +4,28 @@ import 'package:equatable/equatable.dart';
 import 'package:flunancier/models/transaction_category.dart';
 
 enum PaymentMethod {
-  undefined,
-  check,
-  card,
-  transfer,
-  cash,
-  directDebit,
-  interests,
+  undefined, // 0
+  check, // 1
+  card, // 2
+  transfer, // 3
+  cash, // 4
+  directDebit, // 5
+  interests, // 6
 }
 
 class Transaction extends Equatable {
-  static const collectionName = "transactions";
-  static const entryUuid = "uuid";
-  static const entryName = "name";
-  static const entryMontant = "montant";
-  static const entryDateTime = "dateTime";
-  static const entryCategory = "category";
-  static const entryPaymentMethod = "paymentMethod";
-  static const entryAccountUuid = "accountUuid";
+  static const collectionName = 'transactions';
+  static const entryUuid = 'uuid';
+  static const entryName = 'name';
+  static const entryMontant = 'montant';
+  static const entryDateTime = 'dateTime';
+  static const entryCategory = 'category';
+  static const entryPaymentMethod = 'paymentMethod';
+  static const entryAccountUuid = 'accountUuid';
 
   final String uuid;
   final String name;
-  final double montant;
+  final num montant;
   final DateTime dateTime;
   final TransactionCategory category;
   final PaymentMethod paymentMethod;
@@ -44,12 +44,12 @@ class Transaction extends Equatable {
   factory Transaction.fromFireStore(Map<String, dynamic> json) => Transaction(
         uuid: json[entryUuid] as String,
         name: json[entryName] as String,
-        montant: json[entryMontant] as double,
+        montant: json[entryMontant] as num,
         dateTime: (json[entryDateTime] as Timestamp).toDate(),
         category: TransactionCategory.fromFireStore(
           json[entryCategory] as Map<String, dynamic>,
         ),
-        paymentMethod: PaymentMethod.values[json[entryAccountUuid] as int],
+        paymentMethod: PaymentMethod.values[json[entryPaymentMethod] as int],
         accountUuid: json[entryAccountUuid] as String,
       );
 

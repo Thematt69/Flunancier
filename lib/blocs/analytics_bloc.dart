@@ -16,13 +16,13 @@ class AnalyticsBloc extends BlocBase {
 
   Future<void> logLogin() async {
     await _analytics.logLogin(
-      loginMethod: "email",
+      loginMethod: 'email',
     );
   }
 
   Future<void> logRegister() async {
     await _analytics.logSignUp(
-      signUpMethod: "email",
+      signUpMethod: 'email',
     );
   }
 

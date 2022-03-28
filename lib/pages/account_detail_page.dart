@@ -39,8 +39,11 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         account?.plafond == null ? null : account!.total * 1 / account.plafond!;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            Navigator.pushNamed(context, AddTransactionPage.routeName),
+        onPressed: () => Navigator.pushNamed(
+          context,
+          AddTransactionPage.routeName,
+          arguments: account,
+        ),
         tooltip: 'Ajouter une transaction',
         child: const Icon(Icons.add_card_outlined),
       ),

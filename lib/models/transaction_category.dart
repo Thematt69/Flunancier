@@ -1,26 +1,22 @@
 import 'package:equatable/equatable.dart';
+import 'package:flunancier/models/transaction_sub_category.dart';
 import 'package:flutter/material.dart';
-
-enum TypeTransaction { expenses, income }
 
 class TransactionCategory extends Equatable {
   static const entryName = 'name';
   static const entryIcon = 'icon';
   static const entryColor = 'color';
-  static const entryType = 'type';
   static const entrySubCategory = 'subCategory';
 
   final String name;
   final IconData icon;
   final Color color;
-  final TypeTransaction type;
-  final List<TransactionCategory> subCategory;
+  final List<TransactionSubCategory> subCategory;
 
   const TransactionCategory({
     required this.name,
     required this.icon,
     required this.color,
-    required this.type,
     required this.subCategory,
   });
 
@@ -29,24 +25,22 @@ class TransactionCategory extends Equatable {
         name: json[entryName] as String,
         icon: IconData(json[entryIcon] as int, fontFamily: 'MaterialIcons'),
         color: Color(json[entryColor] as int),
-        type: TypeTransaction.values[json[entryType] as int],
         subCategory: json[entrySubCategory] is List
             ? (json[entrySubCategory] as List)
                 .map(
-                  (e) => TransactionCategory.fromFireStore(
+                  (e) => TransactionSubCategory.fromFireStore(
                     e as Map<String, dynamic>,
                   ),
                 )
                 .toList()
-            : <TransactionCategory>[],
+            : <TransactionSubCategory>[],
       );
 
   Map<String, dynamic> toFirestore() => {
         entryName: name,
         entryIcon: icon.codePoint,
         entryColor: color.value,
-        entryType: type.index,
-        entrySubCategory: subCategory.map((e) => e.toFirestore()), // TODO
+        entrySubCategory: subCategory.map((e) => e.toFirestore()).toList(),
       };
 
   @override
@@ -55,13 +49,12 @@ class TransactionCategory extends Equatable {
       name,
       icon,
       color,
-      type,
       subCategory,
     ];
   }
 
   @override
   String toString() {
-    return 'TransactionCategory(name: $name, icon: $icon, color: $color, type: $type, subCategory: $subCategory)';
+    return 'TransactionCategory(name: $name, icon: $icon, color: $color, subCategory: $subCategory)';
   }
 }

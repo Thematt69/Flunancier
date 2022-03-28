@@ -1,5 +1,9 @@
+import 'package:flunancier/blocs/analytics_bloc.dart';
+import 'package:flunancier/blocs/bloc_provider.dart';
+import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/constants/transaction_categories.dart';
 import 'package:flunancier/extensions/enum.dart';
+import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
 import 'package:flunancier/models/transaction_category.dart';
 import 'package:flunancier/widgets/custom_button.dart';
@@ -17,6 +21,8 @@ class AddTransactionPage extends StatefulWidget {
 }
 
 class _AddTransactionPageState extends State<AddTransactionPage> {
+  late final _storeBloc = BlocProvider.of<StoreBloc>(context);
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _montantController = TextEditingController();
@@ -41,6 +47,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   @override
   void initState() {
+    BlocProvider.of<AnalyticsBloc>(context)
+        .setScreenName(AddTransactionPage.routeName);
     _categories.value = expenseCategories + incomeCategories;
     _montantController.addListener(() {
       final montant = double.tryParse(_montantController.text);
@@ -63,6 +71,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ModalRoute.of(context)!.settings.arguments as Account?;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -257,10 +266,25 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                           ),
                           const SizedBox(height: 16),
                           CustomElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                // TODO - Add transaction
-                                Navigator.maybePop(context);
+                                await _storeBloc
+                                    .addTransaction(
+                                      Transaction(
+                                        uuid: 'uuid',
+                                        name: _nameController.text,
+                                        montant: double.parse(
+                                          _montantController.text,
+                                        ),
+                                        dateTime: _dateTime.value,
+                                        category: _category.value!,
+                                        paymentMethod: _paymentMethod.value!,
+                                        accountUuid: account!.uuid,
+                                      ),
+                                    )
+                                    .whenComplete(
+                                      () => Navigator.maybePop(context),
+                                    );
                               }
                             },
                             label: 'AJOUTER',

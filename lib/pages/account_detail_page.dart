@@ -5,6 +5,7 @@ import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
 import 'package:flunancier/pages/add_transaction_page.dart';
+import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/widgets/custom_builder.dart';
 import 'package:flunancier/widgets/indicator_montant.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,14 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                   splashRadius: 22,
                   tooltip:
                       'Se déconnecter de "${_authenticationBloc.currentUser?.email}"',
-                  onPressed: () => _authenticationBloc.signOut(),
+                  onPressed: () async {
+                    await _authenticationBloc.signOut().whenComplete(
+                          () => Navigator.pushReplacementNamed(
+                            context,
+                            LoginPage.routeName,
+                          ),
+                        );
+                  },
                 ),
               ],
             ),

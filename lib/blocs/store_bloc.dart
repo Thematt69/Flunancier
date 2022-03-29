@@ -26,6 +26,13 @@ class StoreBloc extends BlocBase {
       .snapshots()
       .map((event) => event.docs.map((e) => e.data()).toList());
 
+  Stream<Account> onAccountsChangeFromUuid(String uuid) =>
+      _accountCollectionReference
+          .where(Account.entryUuid, isEqualTo: uuid)
+          .orderBy(Account.entryName)
+          .snapshots()
+          .map((event) => event.docs.first.data());
+
   /// Collection pour la table `transactions` avec la conversion via le model `Transaction`
   final CollectionReference<t.Transaction> _transactionCollectionReference =
       FirebaseFirestore.instance

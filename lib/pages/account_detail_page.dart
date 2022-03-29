@@ -35,8 +35,6 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   @override
   Widget build(BuildContext context) {
     final account = ModalRoute.of(context)!.settings.arguments as Account?;
-    final progress =
-        account?.plafond == null ? null : account!.total * 1 / account.plafond!;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(
@@ -76,34 +74,43 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
               ],
             ),
             const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  Row(
+            CustomStreamBuilder<Account>(
+              stream: _storeBloc.onAccountsChangeFromUuid(account.uuid),
+              waitingBuilder: () => const LinearProgressIndicator(),
+              dataBuilder: (context, account) {
+                final progress = account.plafond == null
+                    ? null
+                    : account.total * 1 / account.plafond!;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
                     children: [
-                      if (account.plafond != null)
-                        Text(
-                          '${account.total} €',
-                          style: Theme.of(context).textTheme.subtitle1,
-                        )
-                      else
-                        Text(
-                          'Actuellement : ${account.total} €',
-                          style: Theme.of(context).textTheme.subtitle1,
+                      Row(
+                        children: [
+                          if (account.plafond != null)
+                            Text(
+                              '${account.total} €',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            )
+                          else
+                            Text(
+                              'Actuellement : ${account.total} €',
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                          const Spacer(),
+                          if (account.plafond != null)
+                            Text('Plafond : ${account.plafond} €'),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      if (progress != null)
+                        LinearProgressIndicator(
+                          value: progress,
                         ),
-                      const Spacer(),
-                      if (account.plafond != null)
-                        Text('Plafond : ${account.plafond} €'),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  if (progress != null)
-                    LinearProgressIndicator(
-                      value: progress,
-                    ),
-                ],
-              ),
+                );
+              },
             ),
             const SizedBox(height: 8),
             Expanded(

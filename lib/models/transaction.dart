@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:flunancier/models/transaction_category.dart';
+import 'package:flunancier/models/transaction_sub_category.dart';
 
 enum PaymentMethod {
   undefined, // 0
@@ -27,7 +27,7 @@ class Transaction extends Equatable {
   final String name;
   final num montant;
   final DateTime dateTime;
-  final TransactionCategory category;
+  final TransactionSubCategory category;
   final PaymentMethod paymentMethod;
   final String accountUuid;
 
@@ -46,7 +46,7 @@ class Transaction extends Equatable {
         name: json[entryName] as String,
         montant: json[entryMontant] as num,
         dateTime: (json[entryDateTime] as Timestamp).toDate(),
-        category: TransactionCategory.fromFireStore(
+        category: TransactionSubCategory.fromFireStore(
           json[entryCategory] as Map<String, dynamic>,
         ),
         paymentMethod: PaymentMethod.values[json[entryPaymentMethod] as int],

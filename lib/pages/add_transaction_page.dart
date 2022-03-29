@@ -5,7 +5,8 @@ import 'package:flunancier/constants/transaction_categories.dart';
 import 'package:flunancier/extensions/enum.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
-import 'package:flunancier/models/transaction_category.dart';
+import 'package:flunancier/models/transaction_sub_category.dart';
+import 'package:flunancier/widgets/category_button.dart';
 import 'package:flunancier/widgets/custom_button.dart';
 import 'package:flunancier/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -27,9 +28,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   final _nameController = TextEditingController();
   final _montantController = TextEditingController();
   final _dateTime = ValueNotifier(DateTime.now());
-  final _category = ValueNotifier<TransactionCategory?>(null);
+  final _category = ValueNotifier<TransactionSubCategory?>(null);
   final _paymentMethod = ValueNotifier<PaymentMethod?>(null);
-  final _categories = ValueNotifier<List<TransactionCategory>>([]);
+  final _categories = ValueNotifier<List<TransactionSubCategory>>([]);
 
   final formatDate = DateFormat.yMd('fr_FR');
   final formatTime = DateFormat.jm('fr_FR');
@@ -207,35 +208,19 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             },
                           ),
                           const SizedBox(height: 16),
-                          ValueListenableBuilder<TransactionCategory?>(
-                            valueListenable: _category,
-                            builder: (context, category, _) {
-                              return ValueListenableBuilder<
-                                  List<TransactionCategory>>(
-                                valueListenable: _categories,
-                                builder: (context, categories, _) =>
-                                    DropdownButtonFormField<
-                                        TransactionCategory>(
-                                  value: category,
-                                  onChanged: (value) {
-                                    if (value != null) _category.value = value;
-                                  },
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    label: Text('Catégorie'),
-                                  ),
-                                  items: categories
-                                      .map(
-                                        (category) => DropdownMenuItem<
-                                            TransactionCategory>(
-                                          value: category,
-                                          child: Text(category.name),
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
-                              );
-                            },
+                          ValueListenableBuilder<List<TransactionSubCategory>>(
+                            valueListenable: _categories,
+                            builder: (context, categories, _) =>
+                                ValueListenableBuilder<TransactionSubCategory?>(
+                              valueListenable: _category,
+                              builder: (context, category, _) => CategoryButton(
+                                currentCategory: category,
+                                categories: categories,
+                                onPressed: (category) {
+                                  _category.value = category;
+                                },
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           ValueListenableBuilder<PaymentMethod?>(

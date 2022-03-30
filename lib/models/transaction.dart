@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 
 import 'package:flunancier/models/transaction_sub_category.dart';
 
+enum TransactionType { income, expense }
+
 enum PaymentMethod {
   undefined, // 0
   check, // 1

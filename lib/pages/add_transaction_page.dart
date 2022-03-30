@@ -30,7 +30,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   final _dateTime = ValueNotifier(DateTime.now());
   final _category = ValueNotifier<TransactionSubCategory?>(null);
   final _paymentMethod = ValueNotifier<PaymentMethod?>(null);
-  final _categories = ValueNotifier<List<TransactionSubCategory>>([]);
 
   final formatDate = DateFormat.yMd('fr_FR');
   final formatTime = DateFormat.jm('fr_FR');
@@ -42,7 +41,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     _dateTime.dispose();
     _category.dispose();
     _paymentMethod.dispose();
-    _categories.dispose();
     super.dispose();
   }
 
@@ -50,29 +48,43 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   void initState() {
     BlocProvider.of<AnalyticsBloc>(context)
         .setScreenName(AddTransactionPage.routeName);
-    _categories.value = expenseCategories + incomeCategories;
-    _montantController.addListener(() {
-      final montant = double.tryParse(_montantController.text);
-      if (montant == null) {
-        _categories.value = expenseCategories + incomeCategories;
-      } else if (montant.isNegative) {
-        _categories.value = expenseCategories;
-        if (!expenseCategories.contains(_category.value)) {
-          _category.value = null;
-        }
-      } else {
-        _categories.value = incomeCategories;
-        if (!incomeCategories.contains(_category.value)) {
-          _category.value = null;
-        }
-      }
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final account = ModalRoute.of(context)!.settings.arguments as Account?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    final account = args?['account'] as Account?;
+    final type = args?['type'] as TransactionType?;
+
+    List<TransactionSubCategory> categories = [];
+
+    if (type == TransactionType.expense) {
+      categories = expenseCategories;
+    } else {
+      categories = incomeCategories;
+    }
+
+    bool _validate() {
+      if (_category.value == null) {
+        const snackBar = SnackBar(
+          content: Text('Veuillez choisir une catégorie'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return false;
+      }
+      if (_paymentMethod.value == null) {
+        const snackBar = SnackBar(
+          content: Text('Veuillez choisir un mode de paiement'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return false;
+      }
+      return true && account != null;
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -82,7 +94,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Ajouter une transaction',
+                    type == TransactionType.expense
+                        ? 'Ajouter une dépense'
+                        : 'Ajouter un revenu',
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
@@ -127,6 +141,8 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                 return 'Veuillez entrer un montant';
                               } else if (double.tryParse(value) == null) {
                                 return 'Veuillez indiquer une valeur numérique';
+                              } else if (double.parse(value).isNegative) {
+                                return 'Veuillez indiquer un montant positif';
                               }
                               return null;
                             },
@@ -208,18 +224,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                             },
                           ),
                           const SizedBox(height: 16),
-                          ValueListenableBuilder<List<TransactionSubCategory>>(
-                            valueListenable: _categories,
-                            builder: (context, categories, _) =>
-                                ValueListenableBuilder<TransactionSubCategory?>(
-                              valueListenable: _category,
-                              builder: (context, category, _) => CategoryButton(
-                                currentCategory: category,
-                                categories: categories,
-                                onPressed: (category) {
-                                  _category.value = category;
-                                },
-                              ),
+                          ValueListenableBuilder<TransactionSubCategory?>(
+                            valueListenable: _category,
+                            builder: (context, category, _) => CategoryButton(
+                              currentCategory: category,
+                              categories: categories,
+                              onPressed: (category) {
+                                _category.value = category;
+                              },
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -252,7 +264,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                           const SizedBox(height: 16),
                           CustomElevatedButton(
                             onPressed: () async {
-                              if (_formKey.currentState?.validate() ?? false) {
+                              if ((_formKey.currentState?.validate() ??
+                                      false) &&
+                                  _validate()) {
                                 await _storeBloc
                                     .addTransaction(
                                       Transaction(

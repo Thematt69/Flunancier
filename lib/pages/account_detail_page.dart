@@ -4,10 +4,10 @@ import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
-import 'package:flunancier/pages/add_transaction_page.dart';
 import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/widgets/custom_builder.dart';
 import 'package:flunancier/widgets/indicator_montant.dart';
+import 'package:flunancier/widgets/multiple_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -35,17 +35,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final account = ModalRoute.of(context)!.settings.arguments as Account?;
+    final account = ModalRoute.of(context)?.settings.arguments as Account?;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(
-          context,
-          AddTransactionPage.routeName,
-          arguments: account,
-        ),
-        tooltip: 'Ajouter une transaction',
-        child: const Icon(Icons.add_card_outlined),
-      ),
+      floatingActionButton: MultipleFloatingActionButton(account: account),
       body: SafeArea(
         child: Column(
           children: [
@@ -145,7 +137,11 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                       children: List.generate(data.length, (index) {
                         final transaction = data[index];
                         return ListTile(
-                          title: Text(transaction.name),
+                          title: Text(
+                            transaction.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
                           subtitle: Text(
                             _formatDateTime.format(transaction.dateTime),
                           ),
@@ -159,7 +155,8 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                           trailing:
                               IndicatorMontant(montant: transaction.montant),
                         );
-                      }),
+                      })
+                        ..add(const SizedBox(height: 56 + 16)),
                     ),
                   );
                 },

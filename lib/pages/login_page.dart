@@ -108,6 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () =>
                         Navigator.pushNamed(context, RegisterPage.routeName),
                   ),
+                  const SizedBox(height: 8),
                   CustomElevatedButton(
                     onPressed: () async => _login(),
                     label: 'Connexion',

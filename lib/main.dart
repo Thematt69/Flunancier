@@ -38,7 +38,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _initialRoute = LoginPage.routeName;
     final _theme = ThemeData(primarySwatch: Colors.orange);
     return FutureBuilder(
       future: _init(),
@@ -55,6 +54,7 @@ class MyApp extends StatelessWidget {
             ),
           );
         }
+        String _initialRoute = LoginPage.routeName;
         if (FirebaseAuth.instance.currentUser != null) {
           _initialRoute = MyAccountPage.routeName;
         }

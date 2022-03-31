@@ -122,6 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () =>
                         Navigator.pushNamed(context, LoginPage.routeName),
                   ),
+                  const SizedBox(height: 8),
                   CustomElevatedButton(
                     onPressed: () async => _register(),
                     label: "S'enregistrer",

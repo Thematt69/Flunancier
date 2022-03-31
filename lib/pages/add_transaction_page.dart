@@ -276,7 +276,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                             ? double.parse(
                                                   _montantController.text,
                                                 ) *
-                                                -1
+                                                (-1)
                                             : double.parse(
                                                 _montantController.text,
                                               ),

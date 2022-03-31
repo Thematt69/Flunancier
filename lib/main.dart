@@ -20,8 +20,6 @@ void main() {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  setPathUrlStrategy();
-
   runApp(const MyApp());
 }
 

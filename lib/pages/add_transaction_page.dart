@@ -272,9 +272,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                       Transaction(
                                         uuid: 'uuid',
                                         name: _nameController.text,
-                                        montant: double.parse(
-                                          _montantController.text,
-                                        ),
+                                        montant: type == TransactionType.expense
+                                            ? double.parse(
+                                                  _montantController.text,
+                                                ) *
+                                                -1
+                                            : double.parse(
+                                                _montantController.text,
+                                              ),
                                         dateTime: _dateTime.value,
                                         category: _category.value!,
                                         paymentMethod: _paymentMethod.value!,

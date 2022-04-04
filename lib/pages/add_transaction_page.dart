@@ -143,6 +143,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                 return 'Veuillez indiquer une valeur numérique';
                               } else if (double.parse(value).isNegative) {
                                 return 'Veuillez indiquer un montant positif';
+                              } else if (value.contains('.') &&
+                                  value.split('.').last.length > 2) {
+                                return 'Veuillez indiquer un montant correct, deux décimals maximum';
                               }
                               return null;
                             },

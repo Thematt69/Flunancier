@@ -22,6 +22,8 @@ exports.addOperation = functions.firestore
 
     let newBalance = data["total"] + montant;
 
+    newBalance = Math.round((newBalance + Number.EPSILON) * 100) / 100;
+
     functions.logger.log(newBalance);
 
     await accountRef.update({ total: newBalance });
@@ -42,6 +44,8 @@ exports.updateOperation = functions.firestore
     const data = doc.data();
 
     let newBalance = data["total"] + (afterMontant - beforeMontant);
+
+    newBalance = Math.round((newBalance + Number.EPSILON) * 100) / 100;
 
     functions.logger.log(newBalance);
 

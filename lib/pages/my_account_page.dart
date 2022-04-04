@@ -97,7 +97,9 @@ class _MyAccountPageState extends State<MyAccountPage> {
                                 final account = data[index];
                                 final progress = account.plafond == null
                                     ? null
-                                    : account.total * 1 / account.plafond!;
+                                    : account.total.abs() *
+                                        1 /
+                                        account.plafond!;
                                 return ListTile(
                                   onTap: () {
                                     Navigator.pushNamed(
@@ -111,8 +113,25 @@ class _MyAccountPageState extends State<MyAccountPage> {
                                       ? null
                                       : LinearProgressIndicator(
                                           value: progress,
+                                          color: account.total.isNegative
+                                              ? Colors.red
+                                              : Colors.orange,
+                                          backgroundColor: account
+                                                  .total.isNegative
+                                              ? Colors.red.withOpacity(0.25)
+                                              : Colors.orange.withOpacity(0.25),
                                         ),
-                                  trailing: Text('${account.total} €'),
+                                  trailing: Text(
+                                    '${account.total.toStringAsFixed(2)} €',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(
+                                          color: account.total.isNegative
+                                              ? Colors.red
+                                              : Colors.black,
+                                        ),
+                                  ),
                                 );
                               }),
                             );

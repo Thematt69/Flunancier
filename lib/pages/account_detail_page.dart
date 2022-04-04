@@ -80,7 +80,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
               dataBuilder: (context, account) {
                 final progress = account.plafond == null
                     ? null
-                    : account.total * 1 / account.plafond!;
+                    : account.total.abs() * 1 / account.plafond!;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -89,12 +89,19 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                         children: [
                           if (account.plafond != null)
                             Text(
-                              '${account.total} €',
-                              style: Theme.of(context).textTheme.subtitle1,
+                              '${account.total.toStringAsFixed(2)} €',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1
+                                  ?.copyWith(
+                                    color: account.total.isNegative
+                                        ? Colors.red
+                                        : Colors.black,
+                                  ),
                             )
                           else
                             Text(
-                              'Actuellement : ${account.total} €',
+                              'Actuellement : ${account.total.toStringAsFixed(2)} €',
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                           const Spacer(),
@@ -106,6 +113,12 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                       if (progress != null)
                         LinearProgressIndicator(
                           value: progress,
+                          color: account.total.isNegative
+                              ? Colors.red
+                              : Colors.orange,
+                          backgroundColor: account.total.isNegative
+                              ? Colors.red.withOpacity(0.25)
+                              : Colors.orange.withOpacity(0.25),
                         ),
                     ],
                   ),
@@ -145,11 +158,14 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                           subtitle: Text(
                             _formatDateTime.format(transaction.dateTime),
                           ),
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.transparent,
-                            child: Icon(
-                              transaction.category.icon,
-                              color: transaction.category.color,
+                          leading: Tooltip(
+                            message: transaction.category.name,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              child: Icon(
+                                transaction.category.icon,
+                                color: transaction.category.color,
+                              ),
                             ),
                           ),
                           trailing:

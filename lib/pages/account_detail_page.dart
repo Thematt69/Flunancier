@@ -4,10 +4,10 @@ import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
+import 'package:flunancier/pages/add_transaction_page.dart';
 import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/widgets/custom_builder.dart';
 import 'package:flunancier/widgets/indicator_montant.dart';
-import 'package:flunancier/widgets/multiple_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -37,7 +37,15 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   Widget build(BuildContext context) {
     final account = ModalRoute.of(context)?.settings.arguments as Account?;
     return Scaffold(
-      floatingActionButton: MultipleFloatingActionButton(account: account),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Ajouter une transaction',
+        onPressed: () => Navigator.pushNamed(
+          context,
+          AddTransactionPage.routeName,
+          arguments: account,
+        ),
+        child: const Icon(Icons.add_card_outlined),
+      ),
       body: SafeArea(
         child: Column(
           children: [

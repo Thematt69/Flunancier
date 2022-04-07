@@ -20,7 +20,7 @@ class AuthenticationBloc extends BlocBase {
         debugPrint('User is currently signed out!');
       } else {
         debugPrint('User is signed in!');
-        debugPrint('user => $user');
+        _crashlyticsBloc.setUserIdentifier(user.uid);
       }
     });
   }

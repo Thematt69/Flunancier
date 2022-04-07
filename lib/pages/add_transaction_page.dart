@@ -1,8 +1,11 @@
 import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
+import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/constants/transaction_categories.dart';
+import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
 import 'package:flunancier/models/transaction_sub_category.dart';
+import 'package:flunancier/widgets/custom_button.dart';
 import 'package:flunancier/widgets/income_or_expense_view.dart';
 import 'package:flunancier/widgets/name_and_amount_view.dart';
 import 'package:flunancier/widgets/select_date_time_view.dart';
@@ -24,19 +27,26 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   int _selectedIndex = 0;
+  bool _isValid = false;
 
   final _transactionType = ValueNotifier<TransactionType?>(null);
   final _transactionCategory = ValueNotifier<TransactionSubCategory?>(null);
   final _paymentMethod = ValueNotifier<PaymentMethod?>(null);
+  final _dateTime = ValueNotifier(DateTime.now());
+  final _nameController = TextEditingController();
+  final _montantController = TextEditingController();
 
-  // final _formatDate = DateFormat.yMd('fr_FR');
-  // final _formatTime = DateFormat.jm('fr_FR');
+  static final _amountFormKey = GlobalKey<FormState>();
+
+  late final _storeBloc = BlocProvider.of<StoreBloc>(context);
 
   @override
   void dispose() {
     _transactionType.dispose();
     _transactionCategory.dispose();
     _paymentMethod.dispose();
+    _nameController.dispose();
+    _montantController.dispose();
     super.dispose();
   }
 
@@ -49,16 +59,58 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     _tabController.addListener(() {
       setState(() {
         _selectedIndex = _tabController.index;
+        _isValid = false;
       });
-      debugPrint('Selected Index: $_selectedIndex');
+    });
+
+    _montantController.addListener(() {
+      if (_montantController.text.isNotEmpty &&
+          _nameController.text.isNotEmpty) {
+        setState(() {
+          _isValid = true;
+        });
+      }
+    });
+    _nameController.addListener(() {
+      if (_montantController.text.isNotEmpty &&
+          _nameController.text.isNotEmpty) {
+        setState(() {
+          _isValid = true;
+        });
+      }
     });
 
     super.initState();
   }
 
+  Future<void> submit(Account? account) async {
+    await _storeBloc
+        .addTransaction(
+          Transaction(
+            uuid: 'uuid',
+            name: _nameController.text,
+            montant: _transactionType.value == TransactionType.expense
+                ? double.parse(
+                      _montantController.text,
+                    ) *
+                    (-1)
+                : double.parse(
+                    _montantController.text,
+                  ),
+            dateTime: _dateTime.value,
+            category: _transactionCategory.value!,
+            paymentMethod: _paymentMethod.value!,
+            accountUuid: account?.uuid ?? 'N/A',
+          ),
+        )
+        .whenComplete(
+          () => Navigator.maybePop(context),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final args = ModalRoute.of(context)?.settings.arguments as Account?;
+    final account = ModalRoute.of(context)?.settings.arguments as Account?;
 
     return Scaffold(
       body: SafeArea(
@@ -98,28 +150,52 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                     ),
                     SelectDateTimeView(
                       tabController: _tabController,
+                      onChange: (value) {
+                        _dateTime.value = value;
+                      },
                     ),
-                    const NameAndAmountView(),
+                    NameAndAmountView(
+                      nameController: _nameController,
+                      montantController: _montantController,
+                      formKey: _amountFormKey,
+                      onSubmit: () async => submit(account),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: _selectedIndex >= 1 ? 1 : 0,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      if (_tabController.index >= 1) {
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_selectedIndex >= 1)
+                    IconButton(
+                      onPressed: () {
                         _tabController.animateTo(_tabController.index - 1);
-                      }
-                    },
-                    splashRadius: 22,
-                    color: Theme.of(context).colorScheme.secondary,
-                    icon: const Icon(Icons.arrow_back_outlined),
-                  ),
-                ),
+                      },
+                      splashRadius: 22,
+                      color: Theme.of(context).colorScheme.secondary,
+                      icon: const Icon(Icons.arrow_back_outlined),
+                    ),
+                  if (_selectedIndex == 3)
+                    IconButton(
+                      onPressed: () {
+                        _tabController.animateTo(_tabController.index + 1);
+                      },
+                      splashRadius: 22,
+                      color: Theme.of(context).colorScheme.secondary,
+                      icon: const Icon(Icons.arrow_forward_outlined),
+                    ),
+                  if (_isValid)
+                    CustomTextButton(
+                      onPressed: () async {
+                        if (_amountFormKey.currentState?.validate() ?? false) {
+                          await submit(account);
+                        }
+                      },
+                      label: 'Ajouter',
+                      trailingIcon: Icons.arrow_forward_outlined,
+                    ),
+                ],
               ),
               const SizedBox(height: 8),
               TabBar(

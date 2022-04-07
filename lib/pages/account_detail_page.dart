@@ -24,7 +24,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   late final _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
   late final _storeBloc = BlocProvider.of<StoreBloc>(context);
 
-  final _formatDateTime = DateFormat.yMd('fr_FR').add_jms();
+  final _formatDateTime = DateFormat.yMd('fr_FR').add_jm();
 
   @override
   void initState() {

@@ -27,6 +27,9 @@ exports.addOperation = functions.firestore
     functions.logger.log(newBalance);
 
     await accountRef.update({ total: newBalance });
+
+    const transactionRef = db.collection("transactions").doc(snap.id);
+    await transactionRef.update({ uuid: snap.id });
   });
 
 exports.updateOperation = functions.firestore
@@ -50,4 +53,7 @@ exports.updateOperation = functions.firestore
     functions.logger.log(newBalance);
 
     await accountRef.update({ total: newBalance });
+
+    const transactionRef = db.collection("transactions").doc(change.after.id);
+    await transactionRef.update({ uuid: change.after.id });
   });

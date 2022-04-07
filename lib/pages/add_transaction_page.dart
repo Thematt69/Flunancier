@@ -2,15 +2,17 @@ import 'package:flunancier/blocs/analytics_bloc.dart';
 import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/constants/transaction_categories.dart';
-import 'package:flunancier/extensions/enum.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/models/transaction.dart';
 import 'package:flunancier/models/transaction_sub_category.dart';
-import 'package:flunancier/widgets/category_button.dart';
 import 'package:flunancier/widgets/custom_button.dart';
-import 'package:flunancier/widgets/custom_text_form_field.dart';
+import 'package:flunancier/widgets/income_or_expense_view.dart';
+import 'package:flunancier/widgets/name_and_amount_view.dart';
+import 'package:flunancier/widgets/select_date_time_view.dart';
+import 'package:flunancier/widgets/select_payment_method_view.dart';
+import 'package:flunancier/widgets/select_transaction_category_view.dart';
+import 'package:flunancier/widgets/tab_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AddTransactionPage extends StatefulWidget {
   const AddTransactionPage({Key? key}) : super(key: key);
@@ -21,26 +23,30 @@ class AddTransactionPage extends StatefulWidget {
   State<AddTransactionPage> createState() => _AddTransactionPageState();
 }
 
-class _AddTransactionPageState extends State<AddTransactionPage> {
-  late final _storeBloc = BlocProvider.of<StoreBloc>(context);
+class _AddTransactionPageState extends State<AddTransactionPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+  int _selectedIndex = 0;
+  bool _isValid = false;
 
-  final _formKey = GlobalKey<FormState>();
+  final _transactionType = ValueNotifier<TransactionType?>(null);
+  final _transactionCategory = ValueNotifier<TransactionSubCategory?>(null);
+  final _paymentMethod = ValueNotifier<PaymentMethod?>(null);
+  final _dateTime = ValueNotifier(DateTime.now());
   final _nameController = TextEditingController();
   final _montantController = TextEditingController();
-  final _dateTime = ValueNotifier(DateTime.now());
-  final _category = ValueNotifier<TransactionSubCategory?>(null);
-  final _paymentMethod = ValueNotifier<PaymentMethod?>(null);
 
-  final formatDate = DateFormat.yMd('fr_FR');
-  final formatTime = DateFormat.jm('fr_FR');
+  static final _amountFormKey = GlobalKey<FormState>();
+
+  late final _storeBloc = BlocProvider.of<StoreBloc>(context);
 
   @override
   void dispose() {
+    _transactionType.dispose();
+    _transactionCategory.dispose();
+    _paymentMethod.dispose();
     _nameController.dispose();
     _montantController.dispose();
-    _dateTime.dispose();
-    _category.dispose();
-    _paymentMethod.dispose();
     super.dispose();
   }
 
@@ -48,262 +54,171 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   void initState() {
     BlocProvider.of<AnalyticsBloc>(context)
         .setScreenName(AddTransactionPage.routeName);
+
+    _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _selectedIndex = _tabController.index;
+        _isValid = false;
+      });
+    });
+
+    _montantController.addListener(() {
+      if (_montantController.text.isNotEmpty &&
+          _nameController.text.isNotEmpty) {
+        setState(() {
+          _isValid = true;
+        });
+      }
+    });
+    _nameController.addListener(() {
+      if (_montantController.text.isNotEmpty &&
+          _nameController.text.isNotEmpty) {
+        setState(() {
+          _isValid = true;
+        });
+      }
+    });
+
     super.initState();
+  }
+
+  Future<void> submit(Account? account) async {
+    await _storeBloc
+        .addTransaction(
+          Transaction(
+            uuid: 'uuid',
+            name: _nameController.text,
+            montant: _transactionType.value == TransactionType.expense
+                ? double.parse(
+                      _montantController.text,
+                    ) *
+                    (-1)
+                : double.parse(
+                    _montantController.text,
+                  ),
+            dateTime: _dateTime.value,
+            category: _transactionCategory.value!,
+            paymentMethod: _paymentMethod.value!,
+            accountUuid: account?.uuid ?? 'N/A',
+          ),
+        )
+        .whenComplete(
+          () => Navigator.maybePop(context),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-    final account = args?['account'] as Account?;
-    final type = args?['type'] as TransactionType?;
-
-    List<TransactionSubCategory> categories = [];
-
-    if (type == TransactionType.expense) {
-      categories = expenseCategories;
-    } else {
-      categories = incomeCategories;
-    }
-
-    bool _validate() {
-      if (_category.value == null) {
-        const snackBar = SnackBar(
-          content: Text('Veuillez choisir une catégorie'),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return false;
-      }
-      if (_paymentMethod.value == null) {
-        const snackBar = SnackBar(
-          content: Text('Veuillez choisir un mode de paiement'),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return false;
-      }
-      return true && account != null;
-    }
+    final account = ModalRoute.of(context)?.settings.arguments as Account?;
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    type == TransactionType.expense
-                        ? 'Ajouter une dépense'
-                        : 'Ajouter un revenu',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close_outlined),
-                  splashRadius: 22,
-                  tooltip: 'Fermer',
-                  onPressed: () => Navigator.maybePop(context),
-                ),
-              ],
-            ),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          CustomTextFormField.text(
-                            controller: _nameController,
-                            textInputAction: TextInputAction.next,
-                            label: 'Nom',
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez indiquer un nom';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          CustomTextFormField.number(
-                            controller: _montantController,
-                            textInputAction: TextInputAction.next,
-                            suffixText: '€',
-                            label: 'Montant',
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer un montant';
-                              } else if (double.tryParse(value) == null) {
-                                return 'Veuillez indiquer une valeur numérique';
-                              } else if (double.parse(value).isNegative) {
-                                return 'Veuillez indiquer un montant positif';
-                              } else if (value.contains('.') &&
-                                  value.split('.').last.length > 2) {
-                                return 'Veuillez indiquer un montant correct, deux décimals maximum';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          ValueListenableBuilder<DateTime>(
-                            valueListenable: _dateTime,
-                            builder: (context, dateTime, _) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      showDatePicker(
-                                        context: context,
-                                        initialDate: dateTime,
-                                        firstDate: dateTime.subtract(
-                                          const Duration(days: 365),
-                                        ),
-                                        lastDate: dateTime
-                                            .add(const Duration(days: 365)),
-                                        locale: const Locale('fr', 'FR'),
-                                      ).then((date) async {
-                                        if (date != null) {
-                                          _dateTime.value = DateTime(
-                                            date.year,
-                                            date.month,
-                                            date.day,
-                                            dateTime.hour,
-                                            dateTime.minute,
-                                          );
-                                          debugPrint('date => $date');
-                                        }
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary:
-                                          Theme.of(context).colorScheme.surface,
-                                      onPrimary: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                    child: Text(
-                                      formatDate.format(dateTime).toUpperCase(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay.now(),
-                                      ).then((time) async {
-                                        if (time != null) {
-                                          _dateTime.value = DateTime(
-                                            dateTime.year,
-                                            dateTime.month,
-                                            dateTime.day,
-                                            time.hour,
-                                            time.minute,
-                                          );
-                                          debugPrint('time => $time');
-                                        }
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary:
-                                          Theme.of(context).colorScheme.surface,
-                                      onPrimary: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                    child: Text(
-                                      formatTime.format(dateTime).toUpperCase(),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          ValueListenableBuilder<TransactionSubCategory?>(
-                            valueListenable: _category,
-                            builder: (context, category, _) => CategoryButton(
-                              currentCategory: category,
-                              categories: categories,
-                              onPressed: (category) {
-                                _category.value = category;
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          ValueListenableBuilder<PaymentMethod?>(
-                            valueListenable: _paymentMethod,
-                            builder: (context, paymentMethod, _) {
-                              return DropdownButtonFormField<PaymentMethod>(
-                                value: paymentMethod,
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    _paymentMethod.value = value;
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  label: Text('Methodes de paiement'),
-                                ),
-                                items: PaymentMethod.values
-                                    .map(
-                                      (paymentMethod) =>
-                                          DropdownMenuItem<PaymentMethod>(
-                                        value: paymentMethod,
-                                        child: Text(paymentMethod.label),
-                                      ),
-                                    )
-                                    .toList(),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          CustomElevatedButton(
-                            onPressed: () async {
-                              if ((_formKey.currentState?.validate() ??
-                                      false) &&
-                                  _validate()) {
-                                await _storeBloc
-                                    .addTransaction(
-                                      Transaction(
-                                        uuid: 'uuid',
-                                        name: _nameController.text,
-                                        montant: type == TransactionType.expense
-                                            ? double.parse(
-                                                  _montantController.text,
-                                                ) *
-                                                (-1)
-                                            : double.parse(
-                                                _montantController.text,
-                                              ),
-                                        dateTime: _dateTime.value,
-                                        category: _category.value!,
-                                        paymentMethod: _paymentMethod.value!,
-                                        accountUuid: account!.uuid,
-                                      ),
-                                    )
-                                    .whenComplete(
-                                      () => Navigator.maybePop(context),
-                                    );
-                              }
-                            },
-                            label: 'AJOUTER',
-                          ),
-                        ],
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    IncomeOrExpenseView(
+                      tabController: _tabController,
+                      onSelect: (value) {
+                        _transactionType.value = value;
+                      },
+                    ),
+                    ValueListenableBuilder<TransactionType?>(
+                      valueListenable: _transactionType,
+                      builder: (context, value, child) =>
+                          SelectTransactionCategoryView(
+                        tabController: _tabController,
+                        transactionCategories: value == TransactionType.expense
+                            ? expenseCategories
+                            : incomeCategories,
+                        onSelect: (value) {
+                          _transactionCategory.value = value;
+                        },
                       ),
                     ),
-                  ),
+                    SelectPaymentMethodView(
+                      tabController: _tabController,
+                      onSelect: (value) {
+                        _paymentMethod.value = value;
+                      },
+                    ),
+                    SelectDateTimeView(
+                      tabController: _tabController,
+                      onChange: (value) {
+                        _dateTime.value = value;
+                      },
+                    ),
+                    NameAndAmountView(
+                      nameController: _nameController,
+                      montantController: _montantController,
+                      formKey: _amountFormKey,
+                      onSubmit: () async => submit(account),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_selectedIndex >= 1)
+                    IconButton(
+                      onPressed: () {
+                        _tabController.animateTo(_tabController.index - 1);
+                      },
+                      splashRadius: 22,
+                      color: Theme.of(context).colorScheme.secondary,
+                      icon: const Icon(Icons.arrow_back_outlined),
+                    ),
+                  if (_selectedIndex == 3)
+                    IconButton(
+                      onPressed: () {
+                        _tabController.animateTo(_tabController.index + 1);
+                      },
+                      splashRadius: 22,
+                      color: Theme.of(context).colorScheme.secondary,
+                      icon: const Icon(Icons.arrow_forward_outlined),
+                    ),
+                  if (_isValid)
+                    CustomTextButton(
+                      onPressed: () async {
+                        if (_amountFormKey.currentState?.validate() ?? false) {
+                          await submit(account);
+                        }
+                      },
+                      label: 'Ajouter',
+                      trailingIcon: Icons.arrow_forward_outlined,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TabBar(
+                controller: _tabController,
+                indicator: MaterialIndicator(
+                  tabPosition: TabPosition.top,
+                  topLeftRadius: 20,
+                  topRightRadius: 20,
+                  bottomLeftRadius: 20,
+                  bottomRightRadius: 20,
+                  horizontalPadding: 8,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                tabs: const [
+                  SizedBox(height: 4),
+                  SizedBox(height: 4),
+                  SizedBox(height: 4),
+                  SizedBox(height: 4),
+                  SizedBox(height: 4),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

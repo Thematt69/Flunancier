@@ -56,6 +56,9 @@ class StoreBloc extends BlocBase {
   Future<void> addTransaction(t.Transaction transaction) async =>
       _transactionCollectionReference.add(transaction);
 
+  Future<void> addAccount(Account account) async =>
+      _accountCollectionReference.add(account);
+
   @override
   void dispose() {
     // TODO: implement dispose

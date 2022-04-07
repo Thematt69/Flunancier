@@ -87,7 +87,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     await _storeBloc
         .addTransaction(
           Transaction(
-            uuid: 'uuid',
+            uuid: 'N/A',
             name: _nameController.text,
             montant: _transactionType.value == TransactionType.expense
                 ? double.parse(

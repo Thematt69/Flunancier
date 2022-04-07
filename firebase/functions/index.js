@@ -7,6 +7,13 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
 
+exports.addAccount = functions.firestore
+  .document("accounts/{uid}")
+  .onCreate(async (snap, context) => {
+    const transactionRef = db.collection("accounts").doc(snap.id);
+    await transactionRef.update({ uuid: snap.id });
+  });
+
 exports.addOperation = functions.firestore
   .document("transactions/{uid}")
   .onCreate(async (snap, context) => {
@@ -53,7 +60,4 @@ exports.updateOperation = functions.firestore
     functions.logger.log(newBalance);
 
     await accountRef.update({ total: newBalance });
-
-    const transactionRef = db.collection("transactions").doc(change.after.id);
-    await transactionRef.update({ uuid: change.after.id });
   });

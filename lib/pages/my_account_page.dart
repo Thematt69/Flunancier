@@ -4,6 +4,7 @@ import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/models/account.dart';
 import 'package:flunancier/pages/account_detail_page.dart';
+import 'package:flunancier/pages/add_account_page.dart';
 import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/widgets/custom_builder.dart';
 import 'package:flunancier/widgets/custom_button.dart';
@@ -137,9 +138,12 @@ class _MyAccountPageState extends State<MyAccountPage> {
                             );
                           },
                         ),
-                        const CustomTextButton(
-                          // TODO - Add a button to add a new account
-                          // onPressed: () {},
+                        const SizedBox(height: 16),
+                        CustomTextButton(
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            AddAccountPage.routeName,
+                          ),
                           label: 'Ajouter un compte',
                         ),
                       ],

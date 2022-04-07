@@ -6,6 +6,7 @@ import 'package:flunancier/blocs/bloc_provider.dart';
 import 'package:flunancier/blocs/crashlytics_bloc.dart';
 import 'package:flunancier/blocs/store_bloc.dart';
 import 'package:flunancier/pages/account_detail_page.dart';
+import 'package:flunancier/pages/add_account_page.dart';
 import 'package:flunancier/pages/add_transaction_page.dart';
 import 'package:flunancier/pages/login_page.dart';
 import 'package:flunancier/pages/my_account_page.dart';
@@ -80,6 +81,7 @@ class MyApp extends StatelessWidget {
                   const AccountDetailPage(),
               AddTransactionPage.routeName: (context) =>
                   const AddTransactionPage(),
+              AddAccountPage.routeName: (context) => const AddAccountPage(),
             },
           ),
         );

@@ -53,12 +53,8 @@ class StoreBloc extends BlocBase {
           .snapshots()
           .map((event) => event.docs.map((e) => e.data()).toList());
 
-  Future<void> addTransaction(t.Transaction transaction) async {
-    final docRef = await _transactionCollectionReference.add(transaction);
-    await _transactionCollectionReference.doc(docRef.id).update({
-      t.Transaction.entryUuid: docRef.id,
-    });
-  }
+  Future<void> addTransaction(t.Transaction transaction) async =>
+      _transactionCollectionReference.add(transaction);
 
   @override
   void dispose() {

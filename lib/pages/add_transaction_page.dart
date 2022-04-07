@@ -167,6 +167,13 @@ class _AddTransactionPageState extends State<AddTransactionPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (_selectedIndex == 0)
+                    IconButton(
+                      onPressed: () => Navigator.maybePop(context),
+                      splashRadius: 22,
+                      color: Theme.of(context).colorScheme.secondary,
+                      icon: const Icon(Icons.arrow_back_outlined),
+                    ),
                   if (_selectedIndex >= 1)
                     IconButton(
                       onPressed: () {
